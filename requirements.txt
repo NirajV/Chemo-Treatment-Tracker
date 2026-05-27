@@ -1,0 +1,17 @@
+# Multi-Agent Pipeline System Requirements
+# Install with: pip install -r requirements.txt
+
+# Core AI/ML dependencies
+anthropic>=0.18.0              # Anthropic Claude API client
+
+# Optional dependencies for enhanced functionality
+python-dotenv>=1.0.0           # Environment variable management (optional)
+requests>=2.31.0               # HTTP library (optional, for integrations)
+pydantic>=2.0.0                # Data validation (optional)
+
+# Development dependencies (optional)
+pytest>=7.0.0                  # Testing framework
+pytest-asyncio>=0.21.0         # Async testing support
+black>=23.0.0                  # Code formatting
+flake8>=6.0.0                  # Linting
+mypy>=1.0.0                    # Type checking

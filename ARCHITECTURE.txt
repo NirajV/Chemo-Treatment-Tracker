@@ -1,0 +1,375 @@
+╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                     MULTI-AGENT AUTONOMOUS PIPELINE ARCHITECTURE                                  ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                   USER INTERFACE LAYER                                           │
+├─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                   │
+│   ┌─────────────────────────┐              ┌──────────────────────────────────────────┐        │
+│   │   React Dashboard       │              │   Python CLI (quickstart.py)             │        │
+│   │  ┌─────────────────────┐│              │  ┌──────────────────────────────────────┐│       │
+│   │  │ Project Input Form  ││              │  │ Input: Project Name & Description   ││       │
+│   │  │ - Name              ││              │  │ Output: JSON Results                ││       │
+│   │  │ - Description       ││              │  │ Features: Progress Tracking         ││       │
+│   │  └─────────────────────┘│              │  └──────────────────────────────────────┘│       │
+│   │                         │              │                                          │       │
+│   │ ┌─────────────────────┐ │              │  ┌──────────────────────────────────────┐│       │
+│   │ │ Real-time Monitor   │ │              │  │ Agent Status: idle/working/done    ││       │
+│   │ │ - Agent Progress    │ │              │  │ Output Preview & Logging           ││       │
+│   │ │ - Status Updates    │ │              │  │ Error Handling & Retry Logic       ││       │
+│   │ │ - Execution Time    │ │              │  └──────────────────────────────────────┘│       │
+│   │ │ - Output Preview    │ │              │                                          │       │
+│   │ └─────────────────────┘ │              │  ┌──────────────────────────────────────┐│       │
+│   │                         │              │  │ Results File: pipeline_results.json ││       │
+│   │ ┌─────────────────────┐ │              │  │ - All agent outputs                 ││       │
+│   │ │ Controls            │ │              │  │ - Execution metrics                 ││       │
+│   │ │ - Start Pipeline    │ │              │  │ - Timestamps                        ││       │
+│   │ │ - Reset             │ │              │  └──────────────────────────────────────┘│       │
+│   │ └─────────────────────┘ │              │                                          │       │
+│   └─────────────────────────┘              └──────────────────────────────────────────┘        │
+│                                                                                                   │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+                                              │
+                                              │ Project Description
+                                              ▼
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                   ORCHESTRATION LAYER                                            │
+├─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                   │
+│                      MultiAgentOrchestrator (multi_agent_system.py)                             │
+│                                                                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────────────────┐   │
+│  │  Orchestrator Responsibilities:                                                        │   │
+│  │  • Initialize all 4 agents                                                             │   │
+│  │  • Manage execution sequence (Task → Dev → Test → Deploy)                             │   │
+│  │  • Pass context between agents                                                         │   │
+│  │  • Track pipeline status and errors                                                    │   │
+│  │  • Collect and manage results                                                          │   │
+│  │  • Handle graceful failure recovery                                                    │   │
+│  └────────────────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────────────────┐   │
+│  │  Pipeline Status Tracking:                                                             │   │
+│  │  • idle → running → completed (or failed)                                             │   │
+│  │  • Agent states: idle → working → completed/failed                                    │   │
+│  │  • Context passing between stages                                                      │   │
+│  └────────────────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                                   │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+                                              │
+                                              │ Agent Instances
+                                              ▼
+
+┌──────────────────┬──────────────────┬──────────────────┬──────────────────────────────────────┐
+│ AGENT 1          │ AGENT 2          │ AGENT 3          │ AGENT 4                              │
+│ TASK MANAGER     │ DEVELOPER        │ TESTER           │ DEPLOYER                             │
+├──────────────────┼──────────────────┼──────────────────┼──────────────────────────────────────┤
+│                  │                  │                  │                                      │
+│ Role: Analyzer   │ Role: Coder      │ Role: Validator  │ Role: DevOps Engineer                │
+│                  │                  │                  │                                      │
+│ Input:           │ Input:           │ Input:           │ Input:                               │
+│ • Project desc   │ • Task list      │ • Code           │ • Test approval                      │
+│ • Requirements   │ • Specification  │ • Requirements   │ • Code review                        │
+│                  │ • Architecture   │ • Standards      │                                      │
+│                  │   guidelines     │                  │                                      │
+│                  │                  │                  │                                      │
+│ Processing:      │ Processing:      │ Processing:      │ Processing:                          │
+│ • Parse req      │ • Design archi   │ • Create tests   │ • Design deploy                      │
+│ • Create tasks   │ • Write code     │ • Run tests      │ • Create scripts                     │
+│ • Set priorities │ • Add docs       │ • Check coverage │ • Setup monitoring                   │
+│ • Map deps       │ • Follow best    │ • Find bugs      │ • Plan rollback                      │
+│                  │   practices      │ • Quality report │                                      │
+│                  │                  │                  │                                      │
+│ Output:          │ Output:          │ Output:          │ Output:                              │
+│ • Task list      │ • Code files     │ • Test results   │ • Deploy plan                        │
+│ • Priorities     │ • Architecture   │ • Coverage %     │ • Scripts                            │
+│ • Dependencies   │ • Setup guide    │ • Bug reports    │ • Monitoring                         │
+│ • Specs          │ • API docs       │ • Go/No-Go       │ • Rollback plan                      │
+│                  │ • Dependencies   │                  │ • Documentation                      │
+│                  │                  │                  │                                      │
+│ Status:          │ Status:          │ Status:          │ Status:                              │
+│ ◯ → 🔄 → ✅     │ ◯ → 🔄 → ✅    │ ◯ → 🔄 → ✅    │ ◯ → 🔄 → ✅                        │
+│                  │                  │                  │                                      │
+└──────────────────┴──────────────────┴──────────────────┴──────────────────────────────────────┘
+      │                    │                    │                    │
+      │ execute()          │ execute()          │ execute()          │ execute()
+      │                    │                    │                    │
+      └────────────────────┴────────────────────┴────────────────────┘
+                                    │
+                                    ▼
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                     AGENT LAYER                                                  │
+├─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                   │
+│                          Agent (Base Class - multi_agent_system.py)                             │
+│                                                                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────────────────┐   │
+│  │  Agent Attributes:                                                                     │   │
+│  │  • role: AgentRole                                                                     │   │
+│  │  • state: AgentState (status, output, error, execution_time)                          │   │
+│  │  • project_context: string                                                             │   │
+│  │  • previous_outputs: list (context from prior stages)                                 │   │
+│  └────────────────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────────────────┐   │
+│  │  Agent Methods:                                                                        │   │
+│  │  • get_system_prompt(): str                                                            │   │
+│  │     └─ Returns role-specific instructions (from config.py)                             │   │
+│  │  • execute(task_input: str): str                                                       │   │
+│  │     ├─ Send to Claude API with system prompt                                           │   │
+│  │     ├─ Manage state transitions                                                        │   │
+│  │     └─ Return processed output                                                         │   │
+│  └────────────────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────────────────┐   │
+│  │  Agent State Machine:                                                                  │   │
+│  │                                                                                         │   │
+│  │     idle                                                                                │   │
+│  │      │                                                                                  │   │
+│  │      ├─ execute() called                                                                │   │
+│  │      │                                                                                  │   │
+│  │      ▼                                                                                  │   │
+│  │    working                                                                              │   │
+│  │      │                                                                                  │   │
+│  │      ├─ API call to Claude                                                              │   │
+│  │      │                                                                                  │   │
+│  │      ▼                                                                                  │   │
+│  │    completed ◄────────────── completed                                                 │   │
+│  │      or                                                                                  │   │
+│  │    failed ◄──────────────── error during execution                                     │   │
+│  │                                                                                         │   │
+│  └────────────────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                                   │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+                                              │
+                                              │ API Calls
+                                              ▼
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                      AI SERVICE LAYER                                            │
+├─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                   │
+│                                 Anthropic Claude API                                             │
+│                                                                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────────────────┐   │
+│  │  API Call Structure:                                                                   │   │
+│  │                                                                                         │   │
+│  │  POST /v1/messages                                                                     │   │
+│  │  {                                                                                      │   │
+│  │    "model": "claude-opus-4-20250805",                                                 │   │
+│  │    "max_tokens": 4096,                                                                │   │
+│  │    "system": "<role-specific system prompt>",                                         │   │
+│  │    "messages": [                                                                       │   │
+│  │      {                                                                                  │   │
+│  │        "role": "user",                                                                 │   │
+│  │        "content": "<task input + context from previous agents>"                       │   │
+│  │      }                                                                                  │   │
+│  │    ]                                                                                    │   │
+│  │  }                                                                                      │   │
+│  │                                                                                         │   │
+│  │  Response:                                                                              │   │
+│  │  {                                                                                      │   │
+│  │    "content": [                                                                         │   │
+│  │      {                                                                                  │   │
+│  │        "type": "text",                                                                 │   │
+│  │        "text": "<agent output>"                                                        │   │
+│  │      }                                                                                  │   │
+│  │    ]                                                                                    │   │
+│  │  }                                                                                      │   │
+│  └────────────────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                                   │
+│  ┌────────────────────────────────────────────────────────────────────────────────────────┐   │
+│  │  Configuration (config.py):                                                            │   │
+│  │  • Model: claude-opus-4-20250805 (latest)                                             │   │
+│  │  • Max Tokens: 4096 per request                                                       │   │
+│  │  • Temperature: 0.7 (balanced)                                                         │   │
+│  │  • Timeout: 120 seconds per call                                                       │   │
+│  │  • Retries: 3 with exponential backoff                                                │   │
+│  └────────────────────────────────────────────────────────────────────────────────────────┘   │
+│                                                                                                   │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                    DATA FLOW DIAGRAM                                             │
+├─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                   │
+│  User Input                 Agent Execution                 API Processing                      │
+│  ──────────                ────────────────                 ──────────────                      │
+│                                                                                                   │
+│  Project Name        ┌──────────────────┐   API Request    ┌──────────────────┐               │
+│  & Description  ──→  │  Task Manager    │  ────────────→  │  Claude API      │               │
+│                      │  (Agent 1)       │                  │                  │               │
+│                      └──────┬───────────┘                  │  Model: Opus     │               │
+│                             │                              │  Max Tokens: 4K  │               │
+│                             │ Task Output                  │  Temp: 0.7       │               │
+│                             │ (Tasks list)                 └────────┬─────────┘               │
+│                             ▼                                       │                          │
+│                      ┌──────────────────┐   API Response  ┌────────▼─────────┐               │
+│                      │  Developer       │  ◄─────────────│                   │               │
+│                      │  (Agent 2)       │                 │  Task Manager     │               │
+│                      └──────┬───────────┘                 │  Response         │               │
+│                             │                             └───────────────────┘               │
+│                             │ Code Output                                                     │
+│                             │ (Impl + Docs)                                                  │
+│                             ▼                                                                 │
+│                      ┌──────────────────┐   API Request  ┌──────────────────┐               │
+│                      │  Tester          │  ────────────→ │  Claude API      │               │
+│                      │  (Agent 3)       │                 │                  │               │
+│                      └──────┬───────────┘                 │  Model: Opus     │               │
+│                             │                             │  Max Tokens: 4K  │               │
+│                             │ Test Results               │  Temp: 0.7       │               │
+│                             │ (Coverage %)               └────────┬─────────┘               │
+│                             ▼                                    │                           │
+│                      ┌──────────────────┐   API Response ┌────────▼─────────┐              │
+│                      │  Deployer        │  ◄─────────────│                   │              │
+│                      │  (Agent 4)       │                 │  Developer       │              │
+│                      └──────┬───────────┘                 │  Response        │              │
+│                             │                             └───────────────────┘             │
+│                             │ Deployment                                                    │
+│                             │ Plan & Scripts                                                │
+│                             ▼                                                               │
+│                      ┌──────────────────┐                                                   │
+│                      │  Final Output    │                                                   │
+│                      │  & Results       │                                                   │
+│                      │  JSON Summary    │                                                   │
+│                      └──────────────────┘                                                   │
+│                                                                                                │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                              EXECUTION SEQUENCE (Timeline)                                       │
+├─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                   │
+│  Time    Stage              What's Happening                                Status              │
+│  ────    ─────              ────────────────                                ──────              │
+│                                                                                                   │
+│   T=0    Initialization     Create agents, setup orchestrator              ◯ Idle              │
+│          Pipeline Start     User clicks "Start" or calls run_pipeline()    🔄 Working          │
+│                                                                                                   │
+│   T=1s   STAGE 1            Task Manager executes                          ◯ Task Manager      │
+│          Task Manager       • Analyzes project description                 🔄 Developer        │
+│   T=2-8s └→ API Call        • Sends to Claude API                          ◯ Tester            │
+│   T=8s   └→ Output          • Receives task breakdown                      ◯ Deployer          │
+│          └→ Status: ✅      • Total Time: ~7 seconds                                          │
+│                                                                                                   │
+│   T=9s   STAGE 2            Developer executes                             ◯ Task Manager      │
+│          Developer          • Reviews task list                            ✅ Task Manager     │
+│   T=10s  └→ API Call        • Sends to Claude API                          🔄 Developer        │
+│   T=15s  └→ Output          • Receives code implementation                 ◯ Tester            │
+│          └→ Status: ✅      • Total Time: ~6 seconds                       ◯ Deployer          │
+│                                                                                                   │
+│   T=16s  STAGE 3            Tester executes                                ◯ Task Manager      │
+│          Tester             • Reviews code + task list                     ✅ Task Manager     │
+│   T=17s  └→ API Call        • Sends to Claude API                          ✅ Developer        │
+│   T=22s  └→ Output          • Receives test cases & report                 🔄 Tester           │
+│          └→ Status: ✅      • Total Time: ~6 seconds                       ◯ Deployer          │
+│                                                                                                   │
+│   T=23s  STAGE 4            Deployer executes                              ◯ Task Manager      │
+│          Deployer           • Reviews code + tests + approval              ✅ Task Manager     │
+│   T=24s  └→ API Call        • Sends to Claude API                          ✅ Developer        │
+│   T=29s  └→ Output          • Receives deployment plan                     ✅ Tester           │
+│          └→ Status: ✅      • Total Time: ~6 seconds                       🔄 Deployer         │
+│                                                                                                   │
+│   T=30s  COMPLETE           All stages finished                            ✅ All Agents       │
+│          Results Saved      • Results written to pipeline_results.json     ✅ Pipeline         │
+│          Summary Generated  • Dashboard shows completion                                       │
+│                                                                                                   │
+│  TOTAL EXECUTION TIME: ~30 seconds (API calls) + ~15s (waiting)                               │
+│  TOTAL WALL CLOCK TIME: ~2-3 minutes for simple projects                                       │
+│                                                                                                   │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                  CONFIGURATION HIERARCHY                                        │
+├─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                   │
+│  config.py (Global Configuration)                                                              │
+│  ├─ API_CONFIG                                                                                  │
+│  │  ├─ model: "claude-opus-4-20250805"                                                       │
+│  │  ├─ max_tokens: 4096                                                                      │
+│  │  ├─ temperature: 0.7                                                                      │
+│  │  └─ timeout_seconds: 120                                                                  │
+│  │                                                                                             │
+│  ├─ AGENT_PROMPTS (Role-specific instructions)                                               │
+│  │  ├─ "task_manager": "You are an Expert Project Manager..."                               │
+│  │  ├─ "developer": "You are a Senior Full-Stack Developer..."                              │
+│  │  ├─ "tester": "You are an Expert QA Testing Agent..."                                    │
+│  │  └─ "deployer": "You are an Expert DevOps Engineer..."                                   │
+│  │                                                                                             │
+│  ├─ QUALITY_STANDARDS                                                                         │
+│  │  ├─ code_coverage_minimum: 80                                                             │
+│  │  ├─ max_code_issues_allowed: 5                                                            │
+│  │  └─ security_issues_critical: 0                                                           │
+│  │                                                                                             │
+│  ├─ EXECUTION_CONFIG                                                                          │
+│  │  ├─ sequential_execution: True (always!)                                                  │
+│  │  ├─ max_retries: 3                                                                        │
+│  │  └─ agent_timeout_seconds: 120                                                            │
+│  │                                                                                             │
+│  ├─ PIPELINE_WORKFLOW (4 stages defined)                                                     │
+│  │  ├─ Stage 1: task_manager                                                                │
+│  │  ├─ Stage 2: developer                                                                   │
+│  │  ├─ Stage 3: tester                                                                      │
+│  │  └─ Stage 4: deployer                                                                    │
+│  │                                                                                             │
+│  ├─ PROJECT_TEMPLATES                                                                         │
+│  │  ├─ "web_api"                                                                             │
+│  │  ├─ "web_application"                                                                     │
+│  │  ├─ "microservices"                                                                       │
+│  │  ├─ "data_pipeline"                                                                       │
+│  │  └─ "mobile_app"                                                                          │
+│  │                                                                                             │
+│  └─ INTEGRATIONS (Advanced - Slack, GitHub, Jira)                                            │
+│                                                                                                   │
+│  Runtime (multi_agent_system.py)                                                              │
+│  └─ Overrides config values as needed during execution                                        │
+│                                                                                                   │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                    KEY DESIGN PRINCIPLES                                        │
+├─────────────────────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                                   │
+│  1. SEQUENTIAL EXECUTION                                                                       │
+│     • Agents execute one after another                                                         │
+│     • Each agent waits for previous to complete                                               │
+│     • Ensures proper context and dependencies                                                  │
+│     • No parallel execution (simpler, more reliable)                                          │
+│                                                                                                   │
+│  2. CONTEXT PASSING                                                                            │
+│     • Each agent receives output from previous stage                                          │
+│     • Maintains coherent workflow across stages                                               │
+│     • Each agent understands what came before                                                 │
+│     • Reduces confusion and ensures consistency                                               │
+│                                                                                                   │
+│  3. AUTONOMY                                                                                    │
+│     • No manual intervention once started                                                      │
+│     • Agents make decisions independently                                                      │
+│     • Error handling is automatic                                                              │
+│     • Pipeline completes or fails gracefully                                                  │
+│                                                                                                   │
+│  4. QUALITY ASSURANCE                                                                          │
+│     • Each stage validates previous work                                                       │
+│     • Tests verify code quality                                                                │
+│     • Quality standards enforced                                                               │
+│     • Issues documented and reported                                                           │
+│                                                                                                   │
+│  5. TRANSPARENCY                                                                                │
+│     • Full output from each agent available                                                   │
+│     • Execution metrics tracked                                                                │
+│     • Errors logged and reported                                                               │
+│     • User can review at any time                                                             │
+│                                                                                                   │
+└─────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+╔════════════════════════════════════════════════════════════════════════════════════════════════════╗
+║                              SYSTEM IS READY TO USE!                                              ║
+║                                                                                                    ║
+║  Start → Task Manager → Developer → Tester → Deployer → Complete                                ║
+║                                                                                                    ║
+║  Timeline: ~2-3 minutes (simple) to ~15-30 minutes (complex)                                     ║
+║  Manual Intervention Required: NONE (Fully Automated!)                                           ║
+╚════════════════════════════════════════════════════════════════════════════════════════════════════╝
