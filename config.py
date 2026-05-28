@@ -667,30 +667,6 @@ INTEGRATIONS = {
 }
 
 # ============================================================================
-# UTILITY FUNCTIONS
-# ============================================================================
-
-def get_template(template_name: str) -> dict:
-    """Get a project template by name"""
-    return PROJECT_TEMPLATES.get(template_name, {})
-
-def get_agent_prompt(agent_role: str) -> str:
-    """Get system prompt for an agent"""
-    return AGENT_PROMPTS.get(agent_role, "")
-
-def validate_output(agent_role: str, output: str) -> tuple[bool, list]:
-    """Validate agent output against rules
-    
-    Returns: (is_valid, error_messages)
-    """
-    errors = []
-    rules = VALIDATION_RULES.get(agent_role + "_output", {})
-    
-    # Add validation logic here
-    # This is a placeholder implementation
-    
-    return len(errors) == 0, errors
-
 # ============================================================================
 # EXAMPLE USAGE
 # ============================================================================

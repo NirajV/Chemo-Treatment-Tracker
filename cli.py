@@ -23,7 +23,6 @@ from pathlib import Path
 from multi_agent_system import MultiAgentOrchestrator
 from agent_utils import (
     InputValidator,
-    OutputFormatter,
     ResultAnalyzer,
     ProjectTemplate,
     TEMPLATES,
