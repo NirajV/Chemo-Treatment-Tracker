@@ -18,7 +18,7 @@ import json
 import time
 import logging
 from enum import Enum
-from config import AGENT_PROMPTS
+from config import AGENT_PROMPTS, API_CONFIG, EXECUTION_CONFIG
 from dataclasses import dataclass, asdict
 from typing import Optional, List, Dict, Any
 from datetime import datetime
@@ -494,8 +494,8 @@ Provide professional, complete, and production-ready deployment procedures."""
             # Make API call
             logger.debug(f"Calling Claude API for {self.role.value}")
             response = self.client.messages.create(
-                model="claude-opus-4-20250805",
-                max_tokens=4096,
+                model=API_CONFIG["model"],
+                max_tokens=API_CONFIG["max_tokens"],
                 system=self.get_system_prompt(),
                 messages=[{"role": "user", "content": full_input}]
             )
@@ -536,12 +536,27 @@ Provide professional, complete, and production-ready deployment procedures."""
             str: Enhanced input with previous context
         """
         context = ""
-        if self.previous_outputs:
-            # Include last 2 outputs for context
+        if self.previous_outputs and EXECUTION_CONFIG.get("pass_context_between_agents", True):
+            # Include previous outputs for context (respect token window limit)
             context = "\n\n=== CONTEXT FROM PREVIOUS STAGES ===\n"
-            for i, output in enumerate(self.previous_outputs[-2:], 1):
-                preview = output[:1000] + "..." if len(output) > 1000 else output
-                context += f"\nStage {i} Output Preview:\n{preview}\n"
+            context_window_tokens = EXECUTION_CONFIG.get("context_window_size", 8000)
+            # Rough estimate: ~4 characters per token, include full outputs if they fit
+            max_chars = context_window_tokens * 4
+            included_count = 0
+            for i, output in enumerate(self.previous_outputs, 1):
+                if len(context) + len(output) < max_chars:
+                    context += f"\nStage {i} Output:\n{output}\n"
+                    included_count += 1
+                else:
+                    # If full output doesn't fit, include a preview
+                    preview = output[:500] + "..." if len(output) > 500 else output
+                    context += f"\nStage {i} Output Preview (truncated):\n{preview}\n"
+                    break
+            if not included_count and self.previous_outputs:
+                # Include at least one output preview
+                context = "\n\n=== CONTEXT FROM PREVIOUS STAGES ===\n"
+                preview = self.previous_outputs[-1][:1000] + "..." if len(self.previous_outputs[-1]) > 1000 else self.previous_outputs[-1]
+                context += f"\nStage {len(self.previous_outputs)} Output Preview:\n{preview}\n"
 
         return task_input + context
 
