@@ -18,6 +18,7 @@ import json
 import time
 import logging
 from enum import Enum
+from config import AGENT_PROMPTS
 from dataclasses import dataclass, asdict
 from typing import Optional, List, Dict, Any
 from datetime import datetime
@@ -104,20 +105,14 @@ class Agent:
     def get_system_prompt(self) -> str:
         """
         Get the system prompt for this agent's role.
-        
-        This prompt defines the agent's personality, responsibilities,
-        and output format.
-        
+
+        Reads from config.AGENT_PROMPTS for domain-specific prompt customization.
+        Falls back to default if role not found.
+
         Returns:
             str: The system prompt for this agent
         """
-        prompts = {
-            AgentRole.TASK_MANAGER: self._get_task_manager_prompt(),
-            AgentRole.DEVELOPER: self._get_developer_prompt(),
-            AgentRole.TESTER: self._get_tester_prompt(),
-            AgentRole.DEPLOYER: self._get_deployer_prompt(),
-        }
-        return prompts.get(self.role, "You are an AI agent.")
+        return AGENT_PROMPTS.get(self.role.value, "You are an AI agent.")
 
     def _get_task_manager_prompt(self) -> str:
         """System prompt for Task Manager agent"""
